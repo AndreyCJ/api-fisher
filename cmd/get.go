@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -18,9 +21,10 @@ var getCmd = &cobra.Command{
 
 func GetRequest(cmd *cobra.Command, args []string) {
 	var URL string
-	client := &http.Client{}
+	var payload *strings.Reader = nil
 
 	token, _ := cmd.Flags().GetString(TOKEN_FLAG)
+	isInteracitveMode, _ := cmd.Flags().GetBool(INTERACTIVE_FLAG)
 
 	fmt.Println("TOKEN => ", token)
 	fmt.Println("Args => ", args)
@@ -32,13 +36,26 @@ func GetRequest(cmd *cobra.Command, args []string) {
 		URL = args[0]
 	}
 
-	request, _ := http.NewRequest("GET", URL, nil)
+	if isInteracitveMode {
+		fmt.Println("Enter request payload: ")
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("An error occured while reading input. Please try again", err)
+			return
+		}
+		payload = strings.NewReader(input)
+
+		fmt.Println("THE BODY IS => ", payload)
+	}
+
+	request, _ := http.NewRequest("GET", URL, payload)
 	if token != "" {
 		request.Header.Add("Authorization", "Bearer "+token)
 		fmt.Println("REQ HEADER", request.Header)
 	}
 
-	response, err := client.Do(request)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -51,19 +68,14 @@ func GetRequest(cmd *cobra.Command, args []string) {
 			fmt.Println(err)
 		}
 
-		fmt.Println("\n---")
-		fmt.Println("Success: ")
-		fmt.Println(string(formattedJSON))
-		fmt.Println("\n---")
-
+		PrintResults("Success: \n" + string(formattedJSON))
 	} else {
-		fmt.Println("\n---")
-		fmt.Println("\nError: " + response.Status)
-		fmt.Println("\n---")
+		PrintResults("\nError: " + response.Status)
 	}
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
 	UseTokenFlag(getCmd)
+	UseInteractiveFlag(getCmd)
 }

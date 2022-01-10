@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	TOKEN_FLAG = "token"
+	TOKEN_FLAG       = "token"
+	INTERACTIVE_FLAG = "advanced"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -42,4 +43,9 @@ func init() {
 func UseTokenFlag(cmd *cobra.Command) string {
 	cmd.Flags().StringP(TOKEN_FLAG, "t", "", "auth token")
 	return TOKEN_FLAG
+}
+
+func UseInteractiveFlag(cmd *cobra.Command) string {
+	cmd.Flags().BoolP(INTERACTIVE_FLAG, "a", false, "advanced mode, allows input")
+	return INTERACTIVE_FLAG
 }

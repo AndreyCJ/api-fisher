@@ -9,6 +9,7 @@ import (
 const (
 	TOKEN_FLAG       = "token"
 	INTERACTIVE_FLAG = "advanced"
+	HEADERS_FLAG     = "headers"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -18,8 +19,6 @@ var rootCmd = &cobra.Command{
 	Long:  `A small api tesrter`,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -28,7 +27,6 @@ func Execute() {
 }
 
 func init() {
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -48,4 +46,9 @@ func UseTokenFlag(cmd *cobra.Command) string {
 func UseInteractiveFlag(cmd *cobra.Command) string {
 	cmd.Flags().BoolP(INTERACTIVE_FLAG, "a", false, "advanced mode, allows input")
 	return INTERACTIVE_FLAG
+}
+
+func UseHeadersFlag(cmd *cobra.Command) string {
+	cmd.Flags().BoolP(HEADERS_FLAG, "h", false, "Allows headers input")
+	return HEADERS_FLAG
 }
